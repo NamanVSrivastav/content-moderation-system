@@ -1,4 +1,4 @@
-# content-moderation-system# Content Moderation System
+# Content Moderation System
 
 ## Table of Contents
 - [Setup Instructions](#setup-instructions)

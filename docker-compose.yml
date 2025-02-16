@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - db
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/moderations
+      - REDIS_URL=redis://redis:6379/0
+  worker:
+    build: .
+    command: celery -A app.tasks.moderation_tasks worker --loglevel=info
+    depends_on:
+      - redis
+      - db
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: moderations
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+volumes:
+  postgres_data:
